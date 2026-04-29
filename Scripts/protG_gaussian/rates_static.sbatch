@@ -6,7 +6,7 @@
 #SBATCH --mem=2GB
 #SBATCH --time=03:00:00
 #SBATCH --job-name=protGgauss
-#SBATCH --output=../../Results/Rates/rates_static.out
+#SBATCH --output=../../Results/Rates/rates_protg_static.out
 
 
 echo "Q"

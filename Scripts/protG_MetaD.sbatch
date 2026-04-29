@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=2GB
 #SBATCH --time=3:00:00
-#SBATCH --job-name=protgMTD
-#SBATCH --output=../Results/Rates/rates_metad.out
+#SBATCH --job-name=protGmtd
+#SBATCH --output=../Results/Rates/rates_protg_metad.out
 
 colvar="metad_short.colvar"
 log_file="p.log"
