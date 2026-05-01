@@ -1,0 +1,45 @@
+UNITS LENGTH=A TIME=fs ENERGY=kcal/mol
+# WHOLEMOLECULES ENTITY0=9021-9080
+
+c1: COM ATOMS=9021-9080
+c2: COM ATOMS=1-9020:3 NOPBC
+c3: COM ATOMS=8121-9020 NOPBC
+
+distance: DISTANCE ATOMS=c2,c1 COMPONENTS
+real: DISTANCE ATOMS=c2,c1
+
+xydist2: COMBINE ARG=distance.x,distance.y POWERS=2,2 PERIODIC=NO
+xydist: COMBINE ARG=xydist2 POWERS=0.5 PERIODIC=NO
+
+#top of cavity, center of cavity, center of ful, top of ful
+twist: TORSION ATOMS=8615,8571,c1,9076
+
+#The conversion factor is 69.4786 pN = 1 kcal/mol/Angstrom
+#100pN = 1.4425 kcal/mol/A
+
+# no need for walls, use committor to stop simulation
+COMMITTOR ...
+  ARG=distance.z,xydist
+  STRIDE=50
+  BASIN_LL1=15.0,6.0
+  BASIN_UL1=17.0,9.9
+... COMMITTOR
+
+combo: CUSTOM ARG=distance.z,twist FUNC=__COEFF__*x+sqrt(1-__COEFF__^2)*y PERIODIC=NO
+
+OPES_METAD ...
+ LABEL=opes
+ ARG=combo # your cv
+ PACE=500 # 2 fs/step * 600 steps = 1200 fs = 1.2 ps
+ TEMP=300.0
+ FILE=__PREFIX__.kernels
+ BARRIER=__BARRIER__
+ STRIDE=2
+ STATE_WFILE=__PREFIX__.state.data
+ #STATE_RFILE=__PREFIX__.state.data
+ #RESTART=AUTO
+... OPES_METAD
+
+#PRINT ARG=d1.* STRIDE=500 FILE=__PREFIX__.water.out
+PRINT ARG=opes.* STRIDE=500 FILE=__PREFIX__.opes.out
+PRINT ARG=real,xydist,distance.z,distance.y,distance.x,twist,combo STRIDE=500 FILE=__PREFIX__.colvar.out
